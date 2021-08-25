@@ -81,9 +81,7 @@ If multiple threats are detected, the Server SHOULD select the highest confidenc
 
 ## Header Signature
 
-It is common practice for an organisation to have seperate services for mail gateway filtering (i.e., the MX record), and mailbox storage (i.e., the Client's configured mail server).
-
-It is common practice for organisations to use seperate services for email gateway/filtering, and email mailboxes/delivery.
+It is common practice for an organisation to have seperate services for mail gateway filtering (i.e., the MX record), and mailbox storage/delivery (i.e., the Client's configured mail server).
 
 This presents a challenge to mailbox/delivery services, who need to ensure that messages displayed, and in particular the free-text m= field, is accurate and comes from a source explicitly trusted by the End-user's organisation. 
 
