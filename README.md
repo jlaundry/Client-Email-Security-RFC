@@ -75,17 +75,19 @@ Servers means email Gateways, Mailbox servers, or other appliances that process 
 
 # Implementation
 
-After scanning a message, email Servers MAY insert a **Client-Email-Security** header field, to indicate that this message may contain a specific type of threat.
+After scanning a message, email Servers MAY insert a **Client-Email-Security** header field, to indicate that this message may contain a specific type of threat. If no threat is detected, the Server MAY include a Client-Email-Security header field with t=none, to indicate that the message was scanned.
 
-If present, Clients SHOULD use the Client-Email-Security header to display a warning message to the End-user, indicating that the email may contain a threat. Clients MAY use the presence of a header, and the confidence indicated in the header, to:
+If the Client-Email-Security header is present and the threat indicated is not none, Clients SHOULD use the threat and confidence values to display a specific warning message to the End-user, indicating that the email may contain a threat. Clients MAY use the presence of a header, and the confidence indicated in the header, to:
 
   - prevent certain risky actions, such as clicking links, downloading attachments, or replying to the message, without positive confirmation by the End-user that they understand the risk
 
-Clients SHOULD localise messages to End-users in their preferred language.
+Clients MUST NOT use a single generic warning message for multiple threat and confidence values. The purpose of the warning message should be specific, so that End-users can understand the specific threat they need to be aware of.
+
+Clients SHOULD localise warning messages to End-users in their preferred language.
 
 Clients SHOULD provide configuration options for End-users, to control if additional security controls are applied based on the threat and confidence markings.
 
-If multiple threats are detected, the Server SHOULD select the highest confidence threat. Multiple warning messages should not be displayed to an End-user, as this may cause further confusion.
+If multiple threats are detected, the Server SHOULD select the highest confidence threat. Multiple warning messages SHOULD NOT be displayed to an End-user, as this may cause further confusion.
 
 ## Header Signature
 
@@ -236,6 +238,7 @@ t=
     spam
     new_user
     new_domain
+    none
 
 Note: a threat category for "external" does not exist by design. Stamping every message with a warning that the email originated outside the End-user's organisation degrades the overall effectiveness of the warnings, and End-users become accustomed to disrecarding these warnings.
 
