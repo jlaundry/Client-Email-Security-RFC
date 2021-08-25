@@ -73,9 +73,17 @@ Clients means a piece of software regularly used by an End-user to send and rece
 
 Servers means email Gateways, Mailbox servers, or other appliances that process email messages at the SMTP level
 
-# Implementation Details
+# Implementation
 
 After scanning a message, email Servers MAY insert a **Client-Email-Security** header field, to indicate that this message may contain a specific type of threat.
+
+If present, Clients SHOULD use the Client-Email-Security header to display a warning message to the End-user, indicating that the email may contain a threat. Clients MAY use the presence of a header, and the confidence indicated in the header, to:
+
+  - prevent certain risky actions, such as clicking links, downloading attachments, or replying to the message, without positive confirmation by the End-user that they understand the risk
+
+Clients SHOULD localise messages to End-users in their preferred language.
+
+Clients SHOULD provide configuration options for End-users, to control if additional security controls are applied based on the threat and confidence markings.
 
 If multiple threats are detected, the Server SHOULD select the highest confidence threat. Multiple warning messages should not be displayed to an End-user, as this may cause further confusion.
 
@@ -246,10 +254,6 @@ m=
 bh=
 
 sig=
-
-Clients SHOULD localise messages to End-users in their preferred language.
-
-Clients SHOULD provide configuration options for End-users, to control additional security controls based on the threat and confidence markings.
 
 ## Other uses
 
