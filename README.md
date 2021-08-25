@@ -47,9 +47,9 @@ This includes:
   - messages that include a link to legitimate domains, which often host phishing pages or malware (such as survey sites, document hosting services, and CDNs)
   - messages that have attachments, which cannot be scanned for malware (such as encrypted archives)
 
-The current recommended practice is to add these warning messages to the message HTML. These HTML-based warnings are probematic, because:
+The current recommended practice is to add these warning messages to the message HTML body. These HTML-based warnings are probematic, because:
 
-  - editing the message body canges the DKIM hash, invalidating the DKIM signature, making it difficult for Servers to validate messages
+  - editing the message body changes the DKIM body hash, invalidating the DKIM signature, making it difficult for Servers to validate messages (such as messages that are automatically forwarded, or scanned through multiple filtering steps)
   - because the format of these messages are not standardised, email clients are not able to provide further technical controls to mitigate potential threats
   - these messages are almost exclusively in English, making it potentially difficult for End-users who prefer a different language to understand the context of the warning
   - these warnings can interfere with, or be removed by, automated mail processing and response systems, such as ticket management systems
