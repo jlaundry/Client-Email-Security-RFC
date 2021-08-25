@@ -79,6 +79,20 @@ After scanning a message, email Servers MAY insert a **Client-Email-Security** h
 
 If multiple threats are detected, the Server SHOULD select the highest confidence threat. Multiple warning messages should not be displayed to an End-user, as this may cause further confusion.
 
+## Header Signature
+
+It is common practice for an organisation to have seperate services for mail gateway filtering (i.e., the MX record), and mailbox storage (i.e., the Client's configured mail server).
+
+It is common practice for organisations to use seperate services for email gateway/filtering, and email mailboxes/delivery.
+
+This presents a challenge to mailbox/delivery services, who need to ensure that messages displayed, and in particular the free-text m= field, is accurate and comes from a source explicitly trusted by the End-user's organisation. 
+
+Following the convention set by DKIM, we use a signature of the Client-Email-Security header, which can be validated by the mailbox Server.
+
+Servers MUST validate the Client-Email-Security header, and MUST remove any Client-Email-Security header which is not signed, has an invalid signature, or has a signature from an untrusted source.
+
+Clients MAY validate the Client-Email-Security header, and SHOULD disregard any Client-Email-Security header which is not signed, or have an invalid signature.
+
 ## Tag=Value list
 
 Client-Email-Security uses a simple "tag=value" syntax, to allow for
@@ -238,18 +252,6 @@ sig=
 Clients SHOULD localise messages to End-users in their preferred language.
 
 Clients SHOULD provide configuration options for End-users, to control additional security controls based on the threat and confidence markings.
-
-## Signatures & Trusted Source list
-
-It is common practice for organisations to use seperate services for email gateway/filtering, and email mailboxes/delivery.
-
-This presents a challenge to mailbox/delivery services, who need to ensure that messages displayed, and in particular the free-text m= field, is accurate and comes from a source explicitly trusted by the End-user's organisation. 
-
-Following the convention set by DKIM, 
-
-Clients MAY validate the Client-Email-Security header, and SHOULD disregard any Client-Email-Security header which is not signed, or have an invalid signature.
-
-Servers MUST validate the Client-Email-Security header, and MUST reject any Client-Email-Security header which is not signed, has an invalid signature, or has a signature from an untrusted source.
 
 ## Other uses
 
