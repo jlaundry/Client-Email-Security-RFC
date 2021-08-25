@@ -75,15 +75,134 @@ Servers means email Gateways, Mailbox servers, or other appliances that process 
 
 # Implementation Details
 
+After scanning a message, email Servers MAY insert a **Client-Email-Security** header field, to indicate that this message may contain a specific type of threat.
 
+If multiple threats are detected, the Server SHOULD select the highest confidence threat. Multiple warning messages should not be displayed to an End-user, as this may cause further confusion.
+
+## Tag=Value list
+
+Client-Email-Security uses a simple "tag=value" syntax, to allow for
+easy implementation in Clients, and future extensibility.
+
+Values are a series of strings containing either plain text, "base64"
+text (as defined in [RFC2045], Section 6.8), "qp-section" (ibid,
+Section 6.7), or "dkim-quoted-printable" (as defined in
+Section 2.11).  The name of the tag will determine the encoding of
+each value.  Unencoded semicolon (";") characters MUST NOT occur in
+the tag value, since that separates tag-specs.
+
+    INFORMATIVE IMPLEMENTATION NOTE: Although the "plain text" defined
+    below (as "tag-value") only includes 7-bit characters, an
+    implementation that wished to anticipate future standards would be
+    advised not to preclude the use of UTF-8-encoded ([RFC3629]) text
+    in tag=value lists.
+
+Formally, the ABNF syntax rules are as follows:
+
+tag-list  =  tag-spec *( ";" tag-spec ) [ ";" ]
+tag-spec  =  [FWS] tag-name [FWS] "=" [FWS] tag-value [FWS]
+tag-name  =  ALPHA *ALNUMPUNC
+tag-value =  [ tval *( 1*(WSP / FWS) tval ) ]
+                    ; Prohibits WSP and FWS at beginning and end
+tval      =  1*VALCHAR
+VALCHAR   =  %x21-3A / %x3C-7E
+                    ; EXCLAMATION to TILDE except SEMICOLON
+ALNUMPUNC =  ALPHA / DIGIT / "_"
+
+Note that WSP is allowed anywhere around tags.  In particular, any
+WSP after the "=" and any WSP before the terminating ";" is not part
+of the value; however, WSP inside the value is significant.
+
+Tags MUST be interpreted in a case-sensitive manner.  Values MUST be
+processed as case sensitive unless the specific tag description of
+semantics specifies case insensitivity.
+
+Tags with duplicate names MUST NOT occur within a single tag-list; if
+a tag name does occur more than once, the entire tag-list is invalid.
+
+Whitespace within a value MUST be retained unless explicitly excluded
+by the specific tag description.
+
+Tag=value pairs that represent the default value MAY be included to
+aid legibility.
+
+Unrecognized tags MUST be ignored.
+
+Tags that have an empty value are not the same as omitted tags.  An
+omitted tag is treated as having the default value; a tag with an
+empty value explicitly designates the empty string as the value.
+
+##  Signing and Verification Algorithms
+
+Client-Email-Security supports multiple digital signature algorithms.
+One algorithm is defined by this specification at this time: rsa-sha256.
+Signers MUST implement and sign using rsa-sha256.
+
+## The rsa-sha256 Signing Algorithm
+
+The rsa-sha256 Signing Algorithm computes a message hash as described
+in Section 3.7 using SHA-256 [FIPS-180-3-2008] as the hash-alg.  That
+hash is then signed by the Signer using the RSA algorithm (defined in
+PKCS#1 version 1.5 [RFC3447]) as the crypt-alg and the Signer's
+private key.  The hash MUST NOT be truncated or converted into any
+form other than the native binary form before being signed.  The
+signing algorithm SHOULD use a public exponent of 65537.
+
+## Key Sizes
+
+Selecting appropriate key sizes is a trade-off between cost,
+performance, and risk.  Since short RSA keys more easily succumb to
+off-line attacks, Signers MUST use RSA keys of at least 1024 bits for
+long-lived keys.  Verifiers MUST be able to validate signatures with
+keys ranging from 512 bits to 2048 bits, and they MAY be able to
+validate signatures with larger keys.  Verifier policies may use the
+length of the signing key as one metric for determining whether a
+signature is acceptable.
+
+Factors that should influence the key size choice include the
+following:
+
+o  The practical constraint that large (e.g., 4096-bit) keys might
+    not fit within a 512-byte DNS UDP response packet
+
+o  The security constraint that keys smaller than 1024 bits are
+    subject to off-line attacks
+
+o  Larger keys impose higher CPU costs to verify and sign email
+
+o  Keys can be replaced on a regular basis; thus, their lifetime can
+    be relatively short
+
+o  The security goals of this specification are modest compared to
+    typical goals of other systems that employ digital signatures
+
+See [RFC3766] for further discussion on selecting key sizes.
+
+## Other Algorithms
+
+Other algorithms MAY be defined in the future.  Verifiers MUST ignore
+any signatures using algorithms that they do not implement.
+
+## Selectors
+
+To support multiple concurrent public keys per signing domain, the
+key namespace is subdivided using "selectors".  For example,
+selectors might indicate the names of office locations (e.g.,
+"sanfrancisco", "coolumbeach", and "reykjavik"), the signing date
+(e.g., "january2005", "february2005", etc.), or even an individual
+user.
+
+# Header Field Specification
 
 ## Tag Specifications
 
 d=
     <str>
-    The domain name of the organisation that 
+    The domain name of the organisation that has provided the filtering service.
 
 s=
+    <str>
+    The selector for the message signature.
 
 t=
     This field indicates the type of threat that was detected. Values for this field are:
