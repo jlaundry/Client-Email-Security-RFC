@@ -93,7 +93,7 @@ If multiple threats are detected, the Server SHOULD select the highest confidenc
 
 It is common practice for an organisation to have seperate services for mail gateway filtering (i.e., the MX record), and mailbox storage/delivery (i.e., the Client's configured mail server).
 
-This presents a challenge to mailbox/delivery services, who need to ensure that messages displayed, and in particular the free-text m= field, is accurate and comes from a source explicitly trusted by the End-user's organisation. 
+This presents a challenge to mailbox/delivery services, who need to ensure that messages displayed, and in particular the free-text m= field, is accurate, and comes from a source explicitly trusted by the End-user's organisation.
 
 Following the convention set by DKIM, we use a signature of the Client-Email-Security header, which can be validated by the mailbox Server.
 
@@ -261,6 +261,14 @@ sig=
 ## Other uses
 
 Servers MUST NOT insert the Client-Email-Security header on a message, except when a specific security threat is detected in the email. Using the Client-Email-Security header for advertising, to advise the user of generic security issues (such as "your password is about to expire"), or other organisation-wide messages, is strictly prohibited.
+
+# Security Considerations
+
+## Attacker-controlled headers
+
+During the initial rollout of this standard, mail gateways may not understand the Client-Email-Security header, and may pass it to the mailbox verbatim. Attackers may use this to provide their own header, with t=none, in order to trick the mailbox Server and/or Client into thinking that the email message has already been scanned and is legitimate.
+
+This concern is one of the main reasons behind the signature verification process, and why mailbox servers MUST remove Client-Email-Security headers that are not signed by an explicitly trusted source.
 
 # IANA Considerations
 
